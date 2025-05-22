@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Agrinho - Conexão Campo-Cidade</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Pacifico&family=Quicksand&display=swap');
+
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: 'Quicksand', sans-serif;
+    background: linear-gradient(135deg, #a8dadc, #457b9d);
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  /* Tela inicial do vídeo */
+  #welcome-screen {
+    position: fixed;
+    top: 0; left: 0; right:0; bottom:0;
+    background: #457b9d;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 2000;
+  }
+
+  #welcome-video {
+    width: 90%;
+    max-width: 700px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.6);
+  }
+
+  #welcome-text {
+    margin-top: 15px;
+    font-size: 1.25rem;
+    font-family: 'Pacifico', cursive;
+    text-align: center;
+    max-width: 700px;
+    line-height: 1.4;
+    padding: 0 10px;
+  }
+
+  /* Animação drone */
+  #drone-animation {
+    position: fixed;
+    top: 20vh;
+    left: -150px;
+    width: 120px;
+    height: 80px;
+    background: url('https://cdn-icons-png.flaticon.com/512/744/744465.png') no-repeat center/contain;
+    animation: droneFly 7s linear forwards;
+    z-index: 1500;
+    display: none;
+  }
+
+  @keyframes droneFly {
+    0% { left: -150px; top: 20vh; transform: rotate(0deg);}
+    50% { top: 18vh; }
+    100% { left: 110vw; top: 20vh; transform: rotate(10deg);}
+  }
+
+  /* Container dos cards */
+  .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    padding: 50px 20px 100px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: none; /* inicia invisível, aparece depois do drone */
+  }
+
+  .card {
+    background: rgba(255 255 255 / 0.15);
+    border-radius: 20px;
+    width: 180px;
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    font-size: 1.3rem;
+    font-weight: 700;
+    user-select: none;
+    color: #f1faee;
+    position: relative;
+    font-family: 'Fredoka One', cursive;
+    /* Vamos distribuir os cards em forma de círculo */
+  }
+
+  /* Layout circular dos cards */
+  .container {
+    position: relative;
+    width: 600px;
+    height: 600px;
+  }
+  .card:nth-child(1) { position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%) scale(1.1);}
+  .card:nth-child(2) { position: absolute; top: 50%; left: 85%; transform: translate(-50%, -50%) scale(1);}
+  .card:nth-child(3) { position: absolute; top: 80%; left: 65%; transform: translate(-50%, -50%) scale(1);}
+  .card:nth-child(4) { position: absolute; top: 80%; left: 35%; transform: translate(-50%, -50%) scale(1);}
+  .card:nth-child(5) { position: absolute; top: 50%; left: 15%; transform: translate(-50%, -50%) scale(1);}
+
+  .card:hover {
+    transform: scale(1.15) rotate(5deg);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+  }
+
+  /* Conteúdo que aparece ao clicar */
+  .content {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 900px;
+    background: rgba(255,255,255,0.9);
+    color: #222;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    display: none;
+    z-index: 1000;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: #e63946;
+    color: #fff;
+    border: none;
+    font-weight: 700;
+    font-size: 1.2rem;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  .close-btn:hover {
+    background: #d62828;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Tela inicial com vídeo + texto -->
+  <div id="welcome-screen" aria-label="Tela inicial de boas-vindas">
+    <video id="welcome-video" playsinline autoplay muted>
+      <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
+      Seu navegador não suporta vídeo.
+    </video>
+    <div id="welcome-text">
+      Seja muito bem-vindo ao nosso espaço. Aqui, a cidade e o campo se encontram para celebrar uma conexão cheia de trabalho, tecnologia, cultura e união. Vamos juntos festejar essa parceria que faz o mundo girar? Então, sente-se, pegue um café e explore nosso site.
+    </div>
+  </div>
+
+  <!-- Animação do drone -->
+  <div id="drone-animation" aria-hidden="true"></div>
+
+  <!-- Container dos cards -->
+  <div class="container" role="main" aria-label="Tópicos do site">
+    <div class="card" data-topic="conexao" tabindex="0">Sobre a Conexão</div>
+    <div class="card" data-topic="tecnologia" tabindex="0">Tecnologia no Agro</div>
+    <div class="card" data-topic="eventos" tabindex="0">Eventos do Agro</div>
+    <div class="card" data-topic="campocidade" tabindex="0">Campo e Cidade</div>
+    <div class="card" data-topic="galeria" tabindex="0">Galeria</div>
+  </div>
+
+  <!-- Conteúdo que aparece ao clicar -->
+  <div id="content" class="content" role="dialog" aria-modal="true" aria-labelledby="content-title">
+    <button class="close-btn" aria-label="Fechar conteúdo">×</button>
+    <div id="text-content"></div>
+  </div>
+
+  <!-- Sons -->
+  <audio id="click-sound" src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_64a0e2af14.mp3?filename=click-14145.mp3" preload="auto"></audio>
+  <audio id="ambient-sound" loop src="https://cdn.pixabay.com/download/audio/2021/10/26/audio_8d8853ec0e.mp3?filename=forest-birds-ambient-11049.mp3" preload="auto"></audio>
+
+<script>
+  const welcomeScreen = document.getElementById('welcome-screen');
+  const welcomeVideo = document.getElementById('welcome-video');
+  const drone = document.getElementById('drone-animation');
+  const container = document.querySelector('.container');
+  const cards = document.querySelectorAll('.card');
+  const content = document.getElementById('content');
+  const textContent = document.getElementById('text-content');
+  const closeBtn = document.querySelector('.close-btn');
+  const clickSound = document.getElementById('click-sound');
+  const ambientSound = document.getElementById('ambient-sound');
+
+  const topics = {
+    conexao: `<h2 id="content-title">Sobre a Conexão</h2><p>A conexão entre campo e cidade é essencial para o desenvolvimento sustentável. Ela promove o intercâmbio de cultura, tecnologia e trabalho, fortalecendo a economia e a qualidade de vida de ambos os ambientes.</p>`,
+    tecnologia: `<h2 id="content-title">Tecnologia no Agro</h2><p>O uso de tecnologias avançadas no campo, como sensores, drones e aplicativos, aumenta a produtividade e a sustentabilidade, tornando o agro mais eficiente e inovador.</p>`,
+    eventos: `<h2 id="content-title">Eventos do Agro</h2><p>Feiras como a Agrishow e a ExpoLondrina reúnem produtores, empresas e pesquisadores, mostrando o que há de mais moderno no setor agropecuário.</p><video width="100%" controls style="margin-top:10px;"><source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm">Seu navegador não suporta o vídeo.</video>`,
+    campocidade: `<h2 id="content-title">Campo e Cidade</h2><p>Campo e cidade são interdependentes, compartilhando recursos, cultura e pessoas. Essa parceria é fundamental para o equilíbrio social e ambiental.</p>`,
+    galeria: `<h2 id="content-title">Galeria</h2><p>Confira fotos e vídeos que retratam a beleza e a conexão entre o campo e a cidade.</p><img src="https://cdn.pixabay.com/photo/2016/04/01/09/08/farm-1300875_1280.jpg" alt="Campo" style="width:100%;border-radius:10px;margin-top:10px;">`
+  };
+
+  // Depois que o vídeo terminar
+  welcomeVideo.addEventListener('ended', () => {
+    // Esconde tela de boas-vindas
+    welcomeScreen.style.display = 'none';
+
+    // Mostra drone e inicia animação
+    drone.style.display = 'block';
+
+    // Quando a animação do drone terminar (7s), esconde drone e mostra container
+    setTimeout(() => {
+      drone.style.display = 'none';
+      container.style.display = 'block';
+      ambientSound.volume = 0.15;
+      ambientSound.play().catch(() => {}); // tenta tocar som ambiente
+    }, 7000);
+  });
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      clickSound.play();
+      textContent.innerHTML = topics[card.dataset.topic];
+      content.style.display = 'block';
+      ambientSound.volume = 0.15;
+      ambientSound.play().catch(() => {});
+    });
+    card.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' ') {
+        card.click();
+      }
+    });
+  });
+
+  closeBtn.addEventListener('click', () => {
+    content.style.display = 'none';
+  });
+</script>
+</body>
+</html>
